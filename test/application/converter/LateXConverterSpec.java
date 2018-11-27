@@ -36,5 +36,12 @@ class LateXConverterSpec {
 		String input="4.5x+45x^{2}-2(28+x)";
 		assertThat(conv.processLateXFormula(input)).isEqualTo("4.5*(x)+45*(x)^(2)-2*(28+(x))");
 	}
+	
+	@Test
+	@DisplayName("multiply with variable x works fine test 2")
+	void test5() {
+		String input="2x";
+		assertThat(conv.processLateXFormula(input)).isEqualTo("2*(x)");
+	}
 
 }
