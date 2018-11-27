@@ -1,5 +1,7 @@
 package application;
 
+import java.util.regex.Pattern;
+
 import application.converter.ChartConverter;
 import application.converter.FormulaConverter;
 import application.converter.LateXConverter;
@@ -21,90 +23,114 @@ import javafx.scene.chart.NumberAxis;
 public class SampleController {
 	@FXML
 	private TextField formulaField;
-	@FXML BorderPane mainPane;
-	@FXML Slider scaleSlider;
-	@FXML ScrollPane canvasPane;
+	@FXML
+	BorderPane mainPane;
+	@FXML
+	Slider scaleSlider;
+	@FXML
+	ScrollPane canvasPane;
 	private Drawer drawer;
-	@FXML VBox bigBox;
-	@FXML Label resultLabel;
-	private FormulaConverter converter=new FormulaConverter();
-	private LateXConverter converter2=new LateXConverter();
-	private XYChart.Series<Number, Number> dataSeries1=new Series<>();
-	@FXML LineChart<Number,Number> chart;
-	
-	private ChartConverter converter3=new ChartConverter(dataSeries1,converter);
-	@FXML NumberAxis xAxis;
-	@FXML NumberAxis yAxis;
-	private Tooltip info=new Tooltip();
+	@FXML
+	VBox bigBox;
+	@FXML
+	Label resultLabel;
+	private FormulaConverter converter = new FormulaConverter();
+	private LateXConverter converter2 = new LateXConverter();
+	private XYChart.Series<Number, Number> dataSeries1 = new Series<>();
+	@FXML
+	LineChart<Number, Number> chart;
+
+	private ChartConverter converter3 = new ChartConverter(dataSeries1, converter);
+	@FXML
+	NumberAxis xAxis;
+	@FXML
+	NumberAxis yAxis;
+	private Tooltip info = new Tooltip();
 	private Stage stage;
-	
+	private Pattern function = Pattern.compile("cos|sin|tan|max|exp");
+
 	public void init(Stage stage) {
-		this.stage=stage;
+		this.stage = stage;
 	}
-	
+
 	private void updateAxis(int delta) {
-		if(xAxis.getUpperBound()<10)
-			delta=(delta<0)?-1:1;
-		xAxis.setUpperBound(xAxis.getUpperBound()+delta);
-		xAxis.setLowerBound(xAxis.getLowerBound()-delta);
-		yAxis.setUpperBound(yAxis.getUpperBound()+delta);
-		yAxis.setLowerBound(yAxis.getLowerBound()-delta);
-		xAxis.setTickUnit((xAxis.getUpperBound()-xAxis.getLowerBound())/10);
-		yAxis.setTickUnit((yAxis.getUpperBound()-yAxis.getLowerBound())/10);
+		if(xAxis.getUpperBound()< 10)
+			delta = (delta< 0) ? -1 : 1;
+		xAxis.setUpperBound(xAxis.getUpperBound()+ delta);
+		xAxis.setLowerBound(xAxis.getLowerBound()- delta);
+		yAxis.setUpperBound(yAxis.getUpperBound()+ delta);
+		yAxis.setLowerBound(yAxis.getLowerBound()- delta);
+		xAxis.setTickUnit((xAxis.getUpperBound()- xAxis.getLowerBound())/ 10);
+		yAxis.setTickUnit((yAxis.getUpperBound()- yAxis.getLowerBound())/ 10);
 	}
-	
+
 	@FXML
 	private void initialize() {
-		drawer=new Drawer(bigBox);
+		drawer = new Drawer(bigBox);
 		bigBox.getChildren().add(drawer);
 		chart.getData().add(dataSeries1);
 		Tooltip.install(dataSeries1.getNode(), info);
-		
-		dataSeries1.getNode().setOnMouseMoved(val->{
+
+		dataSeries1.getNode().setOnMouseMoved(val -> {
 			if(info.isShowing())
 				info.hide();
 			Point2D mouseSceneCoords = new Point2D(val.getSceneX(), val.getSceneY());
-		    double x = xAxis.sceneToLocal(mouseSceneCoords).getX();
-		    double y = yAxis.sceneToLocal(mouseSceneCoords).getY();
-//		    System.out.println(xAxis.getValueForDisplay(x)+", "+yAxis.getValueForDisplay(y));
-		    info.setText("y"+resultLabel.getText()+"\n("+String.format("%.2f", xAxis.getValueForDisplay(x))+","+String.format("%.2f", yAxis.getValueForDisplay(y))+")");
-		    info.show(stage);
+			double x = xAxis.sceneToLocal(mouseSceneCoords).getX();
+			double y = yAxis.sceneToLocal(mouseSceneCoords).getY();
+			// System.out.println(xAxis.getValueForDisplay(x)+", "+yAxis.getValueForDisplay(y));
+			info.setText("y"+ resultLabel.getText()+ "\n("+ String.format("%.2f", xAxis.getValueForDisplay(x))+ ","+ String.format("%.2f", yAxis.getValueForDisplay(y))+ ")");
+			info.show(stage);
 		});
-		
-		dataSeries1.getNode().setOnMouseExited(val->{
+
+		dataSeries1.getNode().setOnMouseExited(val -> {
 			if(info.isShowing())
 				info.hide();
 		});
-		
-		chart.setOnScroll(val->{
-//			//Ka¿dy krok kó³eczka to 40 jednostek, w dó³ krêc¹c mamy wartoœæ ujemn¹, a górê wartoœæ dodatni¹
-			if(val.getDeltaY()<0) {
+
+		chart.setOnScroll(val -> {
+			// //Ka¿dy krok kó³eczka to 40 jednostek, w dó³ krêc¹c mamy wartoœæ ujemn¹, a górê wartoœæ dodatni¹
+			if(val.getDeltaY()< 0) {
 				updateAxis(10);
-			}else
+			} else
 				updateAxis(-10);
+			dataSeries1.getData().clear();
+			converter3.processFormula(formulaField.getText());	//aktualizuj, tak, ¿e wykres jest liczony od nowa, gdy zakres x siê zmnienia
 		});
-		
-		
-		
-//		canvas.widthProperty().bind(formulaBox.prefWidthProperty()); 
-//      canvas.heightProperty().bind(formulaBox.prefHeightProperty()); 
-        
-        formulaField.textProperty().addListener((obs,old,newVal)->{
-        	drawer.updateFormula(newVal);
-        	dataSeries1.getData().clear();
-        	if(!newVal.equals("") && !newVal.matches(".*[a-z].*")) {
-        		String tmp=converter.processFormula(converter2.processLateXFormula(newVal));
-        		resultLabel.setText("= "+tmp);
-        		converter3.processFormula(tmp);
-        	}else if(newVal.matches(".*[a-z].*")){	//jeœli równanie zawiera zmienne a-z
-        		resultLabel.setText(newVal);
-        		converter3.processFormula(converter2.processLateXFormula(newVal));
-        	}else
-        		resultLabel.setText("");
-        });
-//        bigBox.widthProperty().addListener((obs,old,newVal)->{
-//        	System.out.println(newVal);
-//        });
-        
+
+		// canvas.widthProperty().bind(formulaBox.prefWidthProperty());
+		// canvas.heightProperty().bind(formulaBox.prefHeightProperty());
+
+		formulaField.textProperty().addListener((obs, old, newVal) -> {
+			drawer.updateFormula(newVal);
+			dataSeries1.getData().clear();
+
+			if(!newVal.equals("")) {
+				String tmp = converter2.processLateXFormula(newVal);
+				String tmp2 = tmp.replaceAll(function.pattern(), "");
+				if(tmp2.contains("x")) {
+					resultLabel.setText(newVal);
+					converter3.processFormula(tmp);
+				} else {
+					tmp2 = converter.processFormula(tmp);
+					resultLabel.setText("= "+ tmp2);
+					converter3.processFormula(tmp2);
+				}
+			} else
+				resultLabel.setText("");
+
+			// if(!newVal.equals("") && !newVal.matches(".*[a-z].*")) {
+			// String tmp=converter.processFormula(converter2.processLateXFormula(newVal));
+			// resultLabel.setText("= "+tmp);
+			// converter3.processFormula(tmp);
+			// }else if(newVal.matches(".*[a-z].*")){ //jeœli równanie zawiera zmienne a-z
+			// resultLabel.setText(newVal);
+			// converter3.processFormula(converter2.processLateXFormula(newVal));
+			// }else
+			// resultLabel.setText("");
+		});
+		// bigBox.widthProperty().addListener((obs,old,newVal)->{
+		// System.out.println(newVal);
+		// });
+
 	}
 }

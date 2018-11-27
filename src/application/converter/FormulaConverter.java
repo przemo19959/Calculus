@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class FormulaConverter {
 	private Pattern number = Pattern.compile("(\\d+\\.\\d+|\\d+).*?"); // w takiej kolejnoœci, aby liczby float i int by³y poprawnie rozpoznawane
 	private Pattern operator = Pattern.compile("(\\+|\\-|\\*|/|%|\\^).*?");
-	private Pattern function = Pattern.compile("(cos|sin|tan|max).*?");
+	private Pattern function = Pattern.compile("(cos|sin|tan|max|exp).*?");
 
 	private Hashtable<String, Integer> priorities = new Hashtable<>();
 
@@ -42,7 +42,7 @@ public class FormulaConverter {
 
 	// shunting-yard implementation for infix expression
 	public String[] classicToRPN(String stringFormula) {
-		if(stringFormula.matches(".*(\\+|\\-|\\*|/|%|\\^|\\(|\\,|\\.)"))
+		if(!stringFormula.matches(".*(\\d|\\))"))
 			return new String[]{};
 		Queue<String> output = new LinkedList<>();
 		Deque<String> stack = new ArrayDeque<>();
@@ -78,7 +78,7 @@ public class FormulaConverter {
 		}
 		while (!stack.isEmpty())
 			output.add(stack.pop()); // zdejmij pozosta³e operatory
-
+		
 		String[] result = new String[output.size()];
 		return output.toArray(result);
 	}
@@ -131,6 +131,9 @@ public class FormulaConverter {
 						break;
 					case "max" :
 						result = Math.max(numbers.pop(), numbers.pop());
+						break;
+					case "exp" :
+						result = (float) Math.exp(numbers.pop());
 						break;
 				}
 				numbers.push(result); // wynik dzia³ania na stos
