@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:id="mainPane" prefHeight="400" prefWidth="800" xmlns="http://javafx.com/javafx/8.0.191" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SampleController">
+	<bottom>
+		<TextField fx:id="formulaField" prefWidth="${mainPane.prefWidth}" BorderPane.alignment="CENTER" />
+	</bottom>
+	<center>
+		<ScrollPane prefHeight="200.0" prefWidth="400" BorderPane.alignment="CENTER">
+			<content>
+				<VBox fx:id="bigBox" prefHeight="200" prefWidth="400">
+					<children>
+						<Label fx:id="resultLabel" alignment="CENTER_RIGHT" />
+					</children>
+				</VBox>
+			</content>
+		</ScrollPane>
+	</center>
+	<top>
+		<HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+			<children>
+				<Slider fx:id="scaleSlider" value="20" />
+			</children>
+		</HBox>
+	</top>
+   <right>
+      <LineChart fx:id="chart" BorderPane.alignment="CENTER" animated="false" legendVisible="false" createSymbols="false">
+        <xAxis>
+          <NumberAxis fx:id="xAxis" side="BOTTOM" upperBound="10" lowerBound="-10" autoRanging="false" tickUnit="1"/>
+        </xAxis>
+        <yAxis>
+          <NumberAxis fx:id="yAxis" side="LEFT" upperBound="10" lowerBound="-10" autoRanging="false" tickUnit="1"/>
+        </yAxis>
+      </LineChart>
+   </right>
+</BorderPane>
