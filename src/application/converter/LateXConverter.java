@@ -5,8 +5,8 @@ import java.util.regex.Pattern;
 
 public class LateXConverter {
 	private Pattern fracSyntax = Pattern.compile(".*\\frac\\{([^}]*)}\\{([^}]*)}.*");
-	private Pattern mulSyntax = Pattern.compile(".*(\\d|x)\\(.*");
-	private Pattern mulSyntax2 = Pattern.compile(".*(\\d)x.*");
+	private Pattern mulSyntax = Pattern.compile(".*(\\d)\\(.*");
+	private Pattern mulSyntax2 = Pattern.compile("(.*\\))([^\\+\\-\\*/\\^%\\)])(.*)");
 
 	public String processLateXFormula(String formula) {
 		String result = formula;
@@ -19,17 +19,29 @@ public class LateXConverter {
 
 	// konwersja ...2(... ==> ...2*(... + ...2x(... ==> ...2*x*(...
 	private String multiplyConversion(String input, Matcher m) {
+		input=input.replace("x", "(x)");
+		input=input.replace("e(x)p", "exp");
 		input = exchanger(m, mulSyntax, "(", input);
-		input = exchanger(m, mulSyntax2, "x", input);
-		input = input.replace("x", "(x)"); // zmienne, dodatkowo otocz nawiasami, aby potem dodaæ 0- i móc obliczyæ wartoœæ
+		input = exchanger2(m, input);
 		return input;
 	}
 
+	// konwersja wzorca pattern jakiemu jest poddany znak
 	private String exchanger(Matcher m, Pattern pattern, String sign, String input) {
 		String tmp = "";
 		while ((m = pattern.matcher(input)).matches()) {
-			tmp = m.group(1)+ "*"+ sign;
-			input = input.replace(m.group(1)+ sign, tmp);
+			tmp = m.group(1) + "*" + sign;
+			input = input.replace(m.group(1) + sign, tmp);
+		}
+		return input;
+	}
+	
+	//konwersja ...)... ==> ...)*... wed³ug wzorca mulSyntax2
+	private String exchanger2(Matcher m, String input) {
+		String tmp = "";
+		while ((m = mulSyntax2.matcher(input)).matches()) {
+			tmp = m.group(1) + "*" + m.group(2)+m.group(3);
+			input = input.replace(m.group(1) + m.group(2)+m.group(3), tmp);
 		}
 		return input;
 	}
@@ -38,8 +50,8 @@ public class LateXConverter {
 	private String fracSyntaxConversion(String input, Matcher m) {
 		String tmp = "";
 		while ((m = fracSyntax.matcher(input)).matches()) {
-			tmp = "(("+ m.group(1)+ ")/("+ m.group(2)+ "))";
-			input = input.replace("\frac{"+ m.group(1)+ "}{"+ m.group(2)+ "}", tmp);
+			tmp = "((" + m.group(1) + ")/(" + m.group(2) + "))";
+			input = input.replace("\frac{" + m.group(1) + "}{" + m.group(2) + "}", tmp);
 		}
 		return input;
 	}
@@ -52,6 +64,6 @@ public class LateXConverter {
 	// tylko do testów
 	public static void main(String[] args) {
 		LateXConverter lateXConverter = new LateXConverter();
-		lateXConverter.processLateXFormula("4.5x+45x^{2}-2(28+x)");
+		lateXConverter.processLateXFormula("xcosx");
 	}
 }

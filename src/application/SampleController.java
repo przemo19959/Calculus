@@ -108,7 +108,7 @@ public class SampleController {
 				String tmp = converter2.processLateXFormula(newVal);
 				String tmp2 = tmp.replaceAll(function.pattern(), "");
 				if(tmp2.contains("x")) {
-					resultLabel.setText(newVal);
+					resultLabel.setText(tmp);
 					converter3.processFormula(tmp);
 				} else {
 					tmp2 = converter.processFormula(tmp);

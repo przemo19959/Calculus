@@ -43,5 +43,19 @@ class LateXConverterSpec {
 		String input="2x";
 		assertThat(conv.processLateXFormula(input)).isEqualTo("2*(x)");
 	}
+	
+	@Test
+	@DisplayName("multiply with variable x works fine test 3")
+	void test6() {
+		String input="xcosx";
+		assertThat(conv.processLateXFormula(input)).isEqualTo("(x)*cos(x)");
+	}
+	
+	@Test
+	@DisplayName("conversion works fine with exp function")
+	void test7() {
+		String input="xcosx+exp(23)";
+		assertThat(conv.processLateXFormula(input)).isEqualTo("(x)*cos(x)+exp(23)");
+	}
 
 }
