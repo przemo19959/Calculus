@@ -261,4 +261,11 @@ class FormulaConverterSpec {
 		String input="(-100)";
 		assertThat(converter.processFormula(input)).isEqualTo("-100,00000");
 	}
+	
+	@Test
+	@DisplayName("log function test 1")
+	void test37() {
+		String input="2+log(2,2)";
+		assertThat(converter.processFormula(input)).isEqualTo("3,00000");
+	}
 }

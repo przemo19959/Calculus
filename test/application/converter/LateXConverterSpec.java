@@ -57,5 +57,19 @@ class LateXConverterSpec {
 		String input="xcosx+exp(23)";
 		assertThat(conv.processLateXFormula(input)).isEqualTo("(x)*cos(x)+exp(23)");
 	}
+	
+	@Test
+	@DisplayName("conversion works fine with log function")
+	void test8() {
+		String input="log_{2}{2+x}";
+		assertThat(conv.processLateXFormula(input)).isEqualTo("log(2,2+(x))");
+	}
+	
+	@Test
+	@DisplayName("conversion works fine with log function test 2")
+	void test9() {
+		String input="45x+log_{2}{2+x}+xcosx";
+		assertThat(conv.processLateXFormula(input)).isEqualTo("45*(x)+log(2,2+(x))+(x)*cos(x)");
+	}
 
 }

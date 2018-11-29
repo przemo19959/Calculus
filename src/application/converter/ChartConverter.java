@@ -27,7 +27,8 @@ public class ChartConverter {
 				for(float i = (float) axis.getLowerBound();i< (float) axis.getUpperBound();i += (xRange/ 120.0)) {
 					argument=(Math.abs(i)< 1e-3) ? 0 :i;
 					try {
-						value = Float.valueOf(conv.processFormula(formula.replace("x", argument+"").replace("e"+argument+"p", "exp")).replace(",", "."));
+						value = Float.valueOf(conv.processFormula(formula.replace("x", argument+"")
+								.replace("e"+argument+"p", "exp").replace("ma"+argument, "max")).replace(",", "."));
 					} catch (NumberFormatException nfe) {
 						dataSeries1.getData().clear();
 						break;
