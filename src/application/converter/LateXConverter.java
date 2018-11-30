@@ -3,17 +3,30 @@ package application.converter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import application.integrals.Integral;
+
 public class LateXConverter {
-	private Pattern fracSyntax = Pattern.compile(".*\\frac\\{([^}]*)}\\{([^}]*)}.*");
+	@SuppressWarnings("unused")
+	private FormulaConverter converter;
+	private Pattern fracSyntax = Pattern.compile(".*\\\\frac\\{([^}]*)}\\{([^}]*)}.*");
 	private Pattern mulSyntax = Pattern.compile(".*(\\d)\\(.*");
 	private Pattern mulSyntax2 = Pattern.compile("(.*\\))([^\\+\\-\\*/\\^%\\)])(.*)");
 	private Pattern logSyntax = Pattern.compile(".*log_\\{(.*)}\\{(.*)}.*");
+	private Pattern integralSyntax = Pattern.compile(".*\\\\int_\\{(.*)}\\^\\{(.*)}\\((.*)\\)dx.*");
+
+	private Integral integralCalc;
+
+	public LateXConverter(FormulaConverter converter) {
+		this.converter = converter;
+		integralCalc = new Integral(converter).withN(1000);
+	}
 
 	public String processLateXFormula(String formula) {
 		String result = formula;
 		Matcher m = null;
 		result = fracSyntaxConversion(result, m);
 		result = logSyntaxConversion(result, m);
+		result = integralSyntaxConversion(result, m);
 		result = bracketConversion(result);
 		result = multiplyConversion(result, m);
 		return result;
@@ -54,7 +67,7 @@ public class LateXConverter {
 		String tmp = "";
 		while ((m = fracSyntax.matcher(input)).matches()) {
 			tmp = "((" + m.group(1) + ")/(" + m.group(2) + "))";
-			input = input.replace("\frac{" + m.group(1) + "}{" + m.group(2) + "}", tmp);
+			input = input.replace("\\frac{" + m.group(1) + "}{" + m.group(2) + "}", tmp);
 		}
 		return input;
 	}
@@ -69,6 +82,20 @@ public class LateXConverter {
 		return input;
 	}
 
+	// konwersja ...\int_{a}^{b} x^2 dx... ==> ...int(a,b,x^2)... zwracana jest ju¿ konkretna wartoœæ ca³ki
+	private String integralSyntaxConversion(String input, Matcher m) {
+		float tmp = 0;
+		while ((m = integralSyntax.matcher(input)).matches()) {
+			try {
+				tmp = integralCalc.simpsonRuleMethod(Float.valueOf(m.group(1)), Float.valueOf(m.group(2)), processLateXFormula(m.group(3)));
+			} catch (NumberFormatException nfe) {
+				return "Syntax Error";
+			}
+			input = input.replace("\\int_{" + m.group(1) + "}^{" + m.group(2) + "}(" + m.group(3) + ")dx", tmp + "");
+		}
+		return input;
+	}
+
 	// konwersja {} ==>()
 	private String bracketConversion(String input) {
 		return input.replace("{", "(").replace("}", ")");
@@ -76,7 +103,7 @@ public class LateXConverter {
 
 	// tylko do testów
 	public static void main(String[] args) {
-		LateXConverter lateXConverter = new LateXConverter();
-		lateXConverter.processLateXFormula("xcosx");
+		LateXConverter lateXConverter = new LateXConverter(new FormulaConverter());
+		lateXConverter.processLateXFormula("{3.5+\frac{5+5}{23}-\frac{4.5-2}{67}}");
 	}
 }

@@ -10,6 +10,8 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import application.integrals.Integral;
+
 public class FormulaConverter {
 	public static final Pattern numberToRight = Pattern.compile("(\\d+\\.\\d+|\\d+).*?"); // w takiej kolejnoœci, aby
 																							// liczby float i int by³y
@@ -21,7 +23,7 @@ public class FormulaConverter {
 	public static final Pattern functionToLeft = Pattern.compile(".*?(cos|sin|tan|max|exp|ln|log)");
 
 	private Hashtable<String, Integer> priorities = new Hashtable<>();
-
+	
 	public FormulaConverter() {
 		priorities.put("(", 0);
 
@@ -74,7 +76,7 @@ public class FormulaConverter {
 				stack.push("(");
 				stringFormula = stringFormula.substring(1);
 			} else if (stringFormula.startsWith(")")) {
-				while (!stack.peek().equals("("))
+				while (!stack.isEmpty() && !stack.peek().equals("("))
 					output.add(stack.pop());
 				stack.pop();
 				if (!stack.isEmpty() && stack.peek().matches(functionToRight.pattern()))
@@ -91,6 +93,7 @@ public class FormulaConverter {
 	}
 
 	public String calculateInRPN(String[] RPNString) {
+//		System.out.println(Arrays.toString(RPNString));
 		if (RPNString.length == 0)
 			return "Syntax Error";
 		float result = 0;

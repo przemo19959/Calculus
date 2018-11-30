@@ -6,8 +6,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import application.integrals.Integral;
+
 class LateXConverterSpec {
-	private LateXConverter conv=new LateXConverter();
+	private FormulaConverter conv1=new FormulaConverter();
+	private LateXConverter conv=new LateXConverter(conv1);
+	private Integral mockIntegral=new Integral(conv1);
 
 	@Test
 	@DisplayName("bracket replacement works fine")
@@ -19,7 +23,7 @@ class LateXConverterSpec {
 	@Test
 	@DisplayName("bracket replacement works fine")
 	void test2() {
-		String input="{3.5+\frac{5+5}{23}-\frac{4.5-2}{67}}";
+		String input="{3.5+\\frac{5+5}{23}-\\frac{4.5-2}{67}}";
 		assertThat(conv.processLateXFormula(input)).isEqualTo("(3.5+((5+5)/(23))-((4.5-2)/(67)))");
 	}
 	
@@ -70,6 +74,16 @@ class LateXConverterSpec {
 	void test9() {
 		String input="45x+log_{2}{2+x}+xcosx";
 		assertThat(conv.processLateXFormula(input)).isEqualTo("45*(x)+log(2,2+(x))+(x)*cos(x)");
+	}
+	
+	@Test
+	@DisplayName("conversion works fine with integral test 1")
+	void test10() {
+		String integral="\\int_{2}^{70}(x^2)dx";
+		float value=Float.valueOf(conv.processLateXFormula(integral));
+		assertThat(mockIntegral.floatEqualWithError(value,114330.66f,0.01f));	//sprawdzenie czy ca³ka jest dobrze policzona
+		integral="23x+"+integral+"+x";
+		assertThat(conv.processLateXFormula(integral)).isEqualTo("23*(x)+"+value+"+(x)");	//sprawdzenie czy dla ca³ego równania mamy dobry wynik
 	}
 
 }

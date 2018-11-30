@@ -73,7 +73,7 @@ public class Integral {
 	
 	public static void main(String[] args) {
 		FormulaConverter conv = new FormulaConverter();
-		LateXConverter conv2=new LateXConverter();
+		LateXConverter conv2=new LateXConverter(conv);
 		Integral integral = new Integral(conv).withN(1000);
 		System.out.println(integral.simpsonRuleMethod(-10, 3, conv2.processLateXFormula("2x")));
 	}

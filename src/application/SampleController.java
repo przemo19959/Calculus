@@ -19,6 +19,7 @@ import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Label;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.control.Button;
 
 public class SampleController {
 	@FXML
@@ -35,7 +36,7 @@ public class SampleController {
 	@FXML
 	Label resultLabel;
 	private FormulaConverter converter = new FormulaConverter();
-	private LateXConverter converter2 = new LateXConverter();
+	private LateXConverter converter2 = new LateXConverter(converter);
 	private XYChart.Series<Number, Number> dataSeries1 = new Series<>();
 	@FXML
 	LineChart<Number, Number> chart;
@@ -47,7 +48,9 @@ public class SampleController {
 	NumberAxis yAxis;
 	private Tooltip info = new Tooltip();
 	private Stage stage;
-	private Pattern function = Pattern.compile("cos|sin|tan|max|exp");
+	private Pattern function = Pattern.compile("cos|sin|tan|max|exp|ln|log");
+	@FXML Button fracButton;
+	@FXML Button integralButton;
 
 	public void init(Stage stage) {
 		this.stage = stage;
@@ -97,8 +100,8 @@ public class SampleController {
 			converter3.processFormula(formulaField.getText());	//aktualizuj, tak, ¿e wykres jest liczony od nowa, gdy zakres x siê zmnienia
 		});
 
-		// canvas.widthProperty().bind(formulaBox.prefWidthProperty());
-		// canvas.heightProperty().bind(formulaBox.prefHeightProperty());
+		drawer.widthProperty().bind(bigBox.prefWidthProperty());
+		drawer.heightProperty().bind(bigBox.prefHeightProperty());
 
 		formulaField.textProperty().addListener((obs, old, newVal) -> {
 			drawer.updateFormula(newVal);
@@ -106,6 +109,7 @@ public class SampleController {
 
 			if(!newVal.equals("")) {
 				String tmp = converter2.processLateXFormula(newVal);
+				System.out.println(tmp);
 				String tmp2 = tmp.replaceAll(function.pattern(), "");
 				if(tmp2.contains("x")) {
 					resultLabel.setText(tmp);
@@ -117,20 +121,15 @@ public class SampleController {
 				}
 			} else
 				resultLabel.setText("");
-
-			// if(!newVal.equals("") && !newVal.matches(".*[a-z].*")) {
-			// String tmp=converter.processFormula(converter2.processLateXFormula(newVal));
-			// resultLabel.setText("= "+tmp);
-			// converter3.processFormula(tmp);
-			// }else if(newVal.matches(".*[a-z].*")){ //jeœli równanie zawiera zmienne a-z
-			// resultLabel.setText(newVal);
-			// converter3.processFormula(converter2.processLateXFormula(newVal));
-			// }else
-			// resultLabel.setText("");
 		});
-		// bigBox.widthProperty().addListener((obs,old,newVal)->{
-		// System.out.println(newVal);
-		// });
+		
+		fracButton.setOnAction(val->{
+			formulaField.setText(formulaField.getText()+"\\frac{1}{1}");
+		});
+		
+		integralButton.setOnAction(val->{
+			formulaField.setText(formulaField.getText()+"\\int_{0}^{1}(x)dx");
+		});
 
 	}
 }

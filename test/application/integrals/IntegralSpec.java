@@ -9,7 +9,7 @@ import application.converter.LateXConverter;
 
 class IntegralSpec {
 	private FormulaConverter conv = new FormulaConverter();
-	private LateXConverter conv2=new LateXConverter();
+	private LateXConverter conv2=new LateXConverter(conv);
 	private Integral integral = new Integral(conv).withN(1000);
 	private String formula;
 	private float result;

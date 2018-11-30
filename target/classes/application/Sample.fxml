@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
 
 <BorderPane fx:id="mainPane" prefHeight="400" prefWidth="800" xmlns="http://javafx.com/javafx/8.0.191" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SampleController">
 	<bottom>
@@ -30,6 +31,8 @@
 		<HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
 			<children>
 				<Slider fx:id="scaleSlider" value="20" />
+				<Button fx:id="fracButton" text="frac" />
+				<Button fx:id="integralButton" text="integral"/>
 			</children>
 		</HBox>
 	</top>
