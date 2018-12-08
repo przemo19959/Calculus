@@ -42,7 +42,7 @@ public class LateXConverter {
 		return input;
 	}
 
-	// konwersja wzorca pattern jakiemu jest poddany znak
+	// konwersja ...(.... ===> ...*(...
 	private String exchanger(Matcher m, Pattern pattern, String sign, String input) {
 		String tmp = "";
 		while ((m = pattern.matcher(input)).matches()) {

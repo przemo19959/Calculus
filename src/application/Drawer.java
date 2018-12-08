@@ -21,9 +21,6 @@ public class Drawer extends Canvas{
 		g2 = new FXGraphics2D(getGraphicsContext2D());
 		g2.scale(20, 20);
 		updateFormula("x=?");
-//		widthProperty().addListener((obs,old,newVal)->{
-//			System.out.println("Container: ["+container.getWidth()+","+container.getHeight()+"] Canvas: ["+getWidth()+","+getHeight()+"]");
-//		});
 	}
 	
 	public void updateFormula(String formulaString) {
@@ -36,6 +33,5 @@ public class Drawer extends Canvas{
 	private void draw() {
 		getGraphicsContext2D().clearRect(0, 0, getWidth(), getHeight());	//wyczyœæ canvas
 		box.draw(g2, 1, 5);
-		
 	}	
 }

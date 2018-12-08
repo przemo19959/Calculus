@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ScrollPane;
@@ -73,18 +74,13 @@ public class SampleController {
 		bigBox.getChildren().add(drawer);
 		chart.getData().add(dataSeries1);
 		Tooltip.install(dataSeries1.getNode(), info);
-
-		dataSeries1.getNode().setOnMouseMoved(val -> {
-			if(info.isShowing())
-				info.hide();
-			Point2D mouseSceneCoords = new Point2D(val.getSceneX(), val.getSceneY());
-			double x = xAxis.sceneToLocal(mouseSceneCoords).getX();
-			double y = yAxis.sceneToLocal(mouseSceneCoords).getY();
-			// System.out.println(xAxis.getValueForDisplay(x)+", "+yAxis.getValueForDisplay(y));
-			info.setText("y"+ resultLabel.getText()+ "\n("+ String.format("%.2f", xAxis.getValueForDisplay(x))+ ","+ String.format("%.2f", yAxis.getValueForDisplay(y))+ ")");
-			info.show(stage);
+		
+		//obs³uga pokazywania chmurki ze wspó³rzêdnymi funkcji
+		dataSeries1.getNode().setOnMouseMoved(ev -> {
+			showPointInfo(ev);
 		});
 
+		//obs³uga wy³aczenia chmurki ze wspó³rzêdnymi
 		dataSeries1.getNode().setOnMouseExited(val -> {
 			if(info.isShowing())
 				info.hide();
@@ -92,35 +88,21 @@ public class SampleController {
 
 		chart.setOnScroll(val -> {
 			// //Ka¿dy krok kó³eczka to 40 jednostek, w dó³ krêc¹c mamy wartoœæ ujemn¹, a górê wartoœæ dodatni¹
-			if(val.getDeltaY()< 0) {
+			if(val.getDeltaY()< 0)
 				updateAxis(10);
-			} else
+			else
 				updateAxis(-10);
 			dataSeries1.getData().clear();
-			converter3.processFormula(formulaField.getText());	//aktualizuj, tak, ¿e wykres jest liczony od nowa, gdy zakres x siê zmnienia
+			converter3.processFormula(converter2.processLateXFormula(formulaField.getText()));	//aktualizuj, tak, ¿e wykres jest liczony od nowa, gdy zakres x siê zmnienia
 		});
 
 		drawer.widthProperty().bind(bigBox.prefWidthProperty());
 		drawer.heightProperty().bind(bigBox.prefHeightProperty());
 
 		formulaField.textProperty().addListener((obs, old, newVal) -> {
-			drawer.updateFormula(newVal);
+			drawer.updateFormula(newVal);	//aktualizacja p³ótna ze wzorem LateX
 			dataSeries1.getData().clear();
-
-			if(!newVal.equals("")) {
-				String tmp = converter2.processLateXFormula(newVal);
-				System.out.println(tmp);
-				String tmp2 = tmp.replaceAll(function.pattern(), "");
-				if(tmp2.contains("x")) {
-					resultLabel.setText(tmp);
-					converter3.processFormula(tmp);
-				} else {
-					tmp2 = converter.processFormula(tmp);
-					resultLabel.setText("= "+ tmp2);
-					converter3.processFormula(tmp2);
-				}
-			} else
-				resultLabel.setText("");
+			updateCalculation(newVal);
 		});
 		
 		fracButton.setOnAction(val->{
@@ -131,5 +113,34 @@ public class SampleController {
 			formulaField.setText(formulaField.getText()+"\\int_{0}^{1}(x)dx");
 		});
 
+	}
+	
+	//wyœwietlanie chmurki ze wspó³rzêdnymi przebeigu funkcji
+	private void showPointInfo(MouseEvent ev) {
+		if(info.isShowing())
+			info.hide();
+		Point2D mouseSceneCoords = new Point2D(ev.getSceneX(), ev.getSceneY());
+		double x = xAxis.sceneToLocal(mouseSceneCoords).getX();
+		double y = yAxis.sceneToLocal(mouseSceneCoords).getY();
+		// System.out.println(xAxis.getValueForDisplay(x)+", "+yAxis.getValueForDisplay(y));
+		info.setText("("+ String.format("%.2f", xAxis.getValueForDisplay(x))+ ","+ String.format("%.2f", yAxis.getValueForDisplay(y))+ ")");
+		info.show(stage);
+	}
+	
+	//przetwórz równanie wpisane do pola tekstowego
+	private void updateCalculation(String formulaFieldContent) {
+		if(!formulaFieldContent.equals("")) {
+			String tmp = converter2.processLateXFormula(formulaFieldContent);	//przerwórz wed³ug konwertera latexa
+			String tmp2 = tmp.replaceAll(function.pattern(), "");	//niektóre funkcje posiadaj¹ w sobie znak x, jak np. exp
+			if(tmp2.contains("x")) {	//jeœli rzeczywiœcie równanie zawiera zmienn¹ x
+				resultLabel.setText(tmp);
+				converter3.processFormula(tmp);
+			} else {
+				tmp2 = converter.processFormula(tmp);
+				resultLabel.setText("= "+ tmp2);
+				converter3.processFormula(tmp2);
+			}
+		} else
+			resultLabel.setText("");
 	}
 }
