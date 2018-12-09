@@ -5,12 +5,10 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
@@ -26,13 +24,6 @@
 			</content>
 		</ScrollPane>
 	</center>
-	<top>
-		<HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-			<children>
-				<Slider fx:id="scaleSlider" value="20" />
-			</children>
-		</HBox>
-	</top>
 	<right>
 		<LineChart fx:id="chart" animated="false" createSymbols="false" legendVisible="false" BorderPane.alignment="CENTER">
 			<xAxis>
@@ -44,16 +35,17 @@
 		</LineChart>
 	</right>
 	<bottom>
-		<VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+		<VBox prefHeight="200.0" prefWidth="${mainPane.prefWidth}" BorderPane.alignment="CENTER">
 			<children>
 				<TextField fx:id="formulaField" />
-				<GridPane fx:id="buttonsGrid">
+				<GridPane fx:id="buttonsGrid" prefHeight="200" prefWidth="${mainPane.prefWidth}">
 					<columnConstraints>
 						<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
 						<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
 						<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
 						<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
 						<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
 					</columnConstraints>
 					<rowConstraints>
@@ -84,8 +76,11 @@
                   		<Button mnemonicParsing="false" text="^" GridPane.columnIndex="3" GridPane.rowIndex="3" />
                   		<Button mnemonicParsing="false" text="\%" GridPane.columnIndex="4" GridPane.rowIndex="3" />
                   		<Button fx:id="fractionButton" mnemonicParsing="false" text="frac" GridPane.columnIndex="5" />
-                  		<Button mnemonicParsing="false" text="()" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+                  		<Button mnemonicParsing="false" text="(" GridPane.columnIndex="5" GridPane.rowIndex="1" />
       					<Button fx:id="integralButton" text="integral" GridPane.columnIndex="5" GridPane.rowIndex="2" />
+                  		<Button mnemonicParsing="false" text=")" GridPane.columnIndex="5" GridPane.rowIndex="3" />
+                 		<Button fx:id="power2" mnemonicParsing="false" text="power2" GridPane.columnIndex="6" />
+                  		<Button fx:id="power" mnemonicParsing="false" text="power" GridPane.columnIndex="6" GridPane.rowIndex="1" />
 					</children>
 				</GridPane>
 			</children>

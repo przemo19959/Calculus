@@ -2,3 +2,22 @@
 #fractionButton{
 	-fx-graphic: "file:D:/java-workspace/Calculus/pictures/fraction.png";
 }
+
+.button{
+	-fx-font-family: 'Consolas';
+	-fx-font-size: 20px;
+	-fx-font-weight: bold;
+	-fx-background-color:rgb(77,77,77);
+	-fx-text-fill: orange;
+	-fx-border-color: orange ;
+}
+
+.button:hover{
+	-fx-background-color:orange;
+	-fx-text-fill: rgb(77,77,77);
+	-fx-border-color: rgb(77,77,77);
+}
+
+.button:pressed{
+	-fx-font-size: 14px;
+}

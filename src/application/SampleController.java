@@ -2,9 +2,6 @@ package application;
 
 import java.util.regex.Pattern;
 
-import org.hamcrest.core.IsInstanceOf;
-import org.scilab.forge.jlatexmath.FractionAtom;
-
 import application.converter.ChartConverter;
 import application.converter.FormulaConverter;
 import application.converter.LateXConverter;
@@ -59,6 +56,11 @@ public class SampleController {
 	@FXML Button integralButton;
 	@FXML GridPane buttonsGrid;
 	@FXML Button fractionButton;
+	@FXML Button bracketButton;
+	private int numberOfGridColumns;
+	private int numberOfGridRows;
+	@FXML Button power2;
+	@FXML Button power;
 
 	public void init(Stage stage) {
 		this.stage = stage;
@@ -82,7 +84,12 @@ public class SampleController {
 		chart.getData().add(dataSeries1);
 		Tooltip.install(dataSeries1.getNode(), info);
 		
-		addEventHandlers();
+		everyButton((button)->{
+			getColAndRowsOfGrid(button);
+			numbersButtonsHandlers(button, button.getText());
+		});
+		
+		everyButton(button->setSizeOfButton(button));
 		
 		//obs³uga pokazywania chmurki ze wspó³rzêdnymi funkcji
 		dataSeries1.getNode().setOnMouseMoved(ev -> {
@@ -121,7 +128,12 @@ public class SampleController {
 		integralButton.setOnAction(val->{
 			formulaField.setText(formulaField.getText()+"\\int_{0}^{1}(x)dx");
 		});
-
+		
+		power2.setOnAction(val->{
+			formulaField.setText(formulaField.getText()+"{()}^{2}");
+		});
+		
+		power.setOnAction(val->formulaField.setText(formulaField.getText()+"{()}^{}"));
 	}
 	
 	//wyœwietlanie chmurki ze wspó³rzêdnymi przebeigu funkcji
@@ -153,21 +165,34 @@ public class SampleController {
 			resultLabel.setText("");
 	}
 	
-	private void addEventHandlers() {
+	private interface Function{
+		public void function(Button button);
+	}
+	
+	private void everyButton(Function function) {
 		Button tmp=null;
 		Node nodeTemp=null;
 		for(int i=0;i<buttonsGrid.getChildren().size();i++) {
 			nodeTemp=buttonsGrid.getChildren().get(i);
 			if(nodeTemp instanceof Button) {
 				tmp=(Button)nodeTemp;
-				String value=tmp.getText();
-				numbersButtonsHandlers(tmp, value);
+				function.function(tmp);				
 			}
 		}
 	}
 	
+	private void getColAndRowsOfGrid(Button tmp) {
+		numberOfGridColumns=Math.max(numberOfGridColumns, (GridPane.getColumnIndex(tmp)!=null)?GridPane.getColumnIndex(tmp):-1);
+		numberOfGridRows=Math.max(numberOfGridRows, (GridPane.getRowIndex(tmp)!=null)?GridPane.getRowIndex(tmp):-1);
+	}
+	
+	private void setSizeOfButton(Button tmp) {
+		tmp.setPrefHeight(buttonsGrid.getPrefHeight()/(numberOfGridRows+1));
+		tmp.setPrefWidth(buttonsGrid.getPrefWidth()/(numberOfGridColumns+1));
+	}
+		
 	private void numbersButtonsHandlers(Button button, String value) {
-		if(value.matches("[\\d\\.\\+\\-\\*/%\\^]")) {
+		if(value.matches("[\\d\\.\\+\\-\\*/%\\^\\(\\)]")) {
 			addToFormulaField(button, value);
 		}else if(value.equals("DEL")) {
 			button.setOnAction(ev->formulaField.clear());
