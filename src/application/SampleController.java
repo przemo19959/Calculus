@@ -2,9 +2,13 @@ package application;
 
 import java.util.regex.Pattern;
 
+import org.hamcrest.core.IsInstanceOf;
+import org.scilab.forge.jlatexmath.FractionAtom;
+
 import application.converter.ChartConverter;
 import application.converter.FormulaConverter;
 import application.converter.LateXConverter;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.control.TextField;
@@ -18,9 +22,11 @@ import javafx.stage.Stage;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Label;
+import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Button;
+import javafx.scene.layout.GridPane;
 
 public class SampleController {
 	@FXML
@@ -50,8 +56,9 @@ public class SampleController {
 	private Tooltip info = new Tooltip();
 	private Stage stage;
 	private Pattern function = Pattern.compile("cos|sin|tan|max|exp|ln|log");
-	@FXML Button fracButton;
 	@FXML Button integralButton;
+	@FXML GridPane buttonsGrid;
+	@FXML Button fractionButton;
 
 	public void init(Stage stage) {
 		this.stage = stage;
@@ -74,6 +81,8 @@ public class SampleController {
 		bigBox.getChildren().add(drawer);
 		chart.getData().add(dataSeries1);
 		Tooltip.install(dataSeries1.getNode(), info);
+		
+		addEventHandlers();
 		
 		//obs³uga pokazywania chmurki ze wspó³rzêdnymi funkcji
 		dataSeries1.getNode().setOnMouseMoved(ev -> {
@@ -105,7 +114,7 @@ public class SampleController {
 			updateCalculation(newVal);
 		});
 		
-		fracButton.setOnAction(val->{
+		fractionButton.setOnAction(val->{
 			formulaField.setText(formulaField.getText()+"\\frac{1}{1}");
 		});
 		
@@ -142,5 +151,32 @@ public class SampleController {
 			}
 		} else
 			resultLabel.setText("");
+	}
+	
+	private void addEventHandlers() {
+		Button tmp=null;
+		Node nodeTemp=null;
+		for(int i=0;i<buttonsGrid.getChildren().size();i++) {
+			nodeTemp=buttonsGrid.getChildren().get(i);
+			if(nodeTemp instanceof Button) {
+				tmp=(Button)nodeTemp;
+				String value=tmp.getText();
+				numbersButtonsHandlers(tmp, value);
+			}
+		}
+	}
+	
+	private void numbersButtonsHandlers(Button button, String value) {
+		if(value.matches("[\\d\\.\\+\\-\\*/%\\^]")) {
+			addToFormulaField(button, value);
+		}else if(value.equals("DEL")) {
+			button.setOnAction(ev->formulaField.clear());
+		}else if(value.equals("OFF")) {
+			button.setOnAction(ev->Platform.exit());
+		}
+	}
+	
+	private void addToFormulaField(Button button,String item) {
+		button.setOnAction(ev->formulaField.setText(formulaField.getText()+item));
 	}
 }
